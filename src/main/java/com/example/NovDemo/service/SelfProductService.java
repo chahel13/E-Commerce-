@@ -5,6 +5,9 @@ import com.example.NovDemo.model.Category;
 import com.example.NovDemo.model.Product;
 import com.example.NovDemo.repositories.CategoryRepository;
 import com.example.NovDemo.repositories.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
@@ -34,8 +37,9 @@ public class SelfProductService implements ProductService {
     }
 
     @Override
-    public List<Product> getAllProducts() {
-             return productRepository.findAll();
+    public Page<Product> getAllProducts(int pageNumber,int pageSize) {
+             Page<Product> allProducts =  productRepository.findAll(PageRequest.of(pageNumber,pageSize,Sort.by("title")));
+             return allProducts;
     }
 
     @Override
@@ -70,8 +74,8 @@ public class SelfProductService implements ProductService {
     }
 
     @Override
-    public Product updateProduct(long productId, Product product) throws ProductNotFoundException{
-      Optional <Product> p = productRepository.findById(productId);
+    public Product updateProduct(Product product) throws ProductNotFoundException{
+      Optional <Product> p = productRepository.findById(product.getId());
       Product exProduct = p.get();
       if(p.isPresent()) {
           if (product.getCategory() != null) {

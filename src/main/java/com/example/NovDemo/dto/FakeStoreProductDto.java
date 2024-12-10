@@ -2,11 +2,14 @@ package com.example.NovDemo.dto;
 
 import com.example.NovDemo.model.Category;
 import com.example.NovDemo.model.Product;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+
 
 public class FakeStoreProductDto {
     private Long id;
@@ -32,13 +35,6 @@ public class FakeStoreProductDto {
     }
 
 
-    public Product toCategory() {
-        Product p = new Product();
-        Category category = new Category();
-        category.setId(id);
-        category.setTitle(title);
-        return p;
-    }
 
 
 }

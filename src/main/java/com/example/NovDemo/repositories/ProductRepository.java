@@ -1,6 +1,8 @@
 package com.example.NovDemo.repositories;
 
 import com.example.NovDemo.model.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +13,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
       Product save(Product product);
 
       Product findByTitle(String title);
-      List<Product> findAll();
+      Page<Product> findAll(Pageable pageable);
 
 
 

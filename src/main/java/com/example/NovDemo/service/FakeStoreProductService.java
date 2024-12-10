@@ -1,9 +1,12 @@
 package com.example.NovDemo.service;
 
 import com.example.NovDemo.Exceptions.ProductNotFoundException;
+import com.example.NovDemo.dto.FakeStoreCategoryDto;
 import com.example.NovDemo.dto.FakeStoreProductDto;
 import com.example.NovDemo.model.Category;
 import com.example.NovDemo.model.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -13,13 +16,20 @@ import java.util.List;
 public class FakeStoreProductService implements ProductService{
 
     private RestTemplate restTemplate;
+    private RedisTemplate redisTemplate;
 
-    public FakeStoreProductService(RestTemplate restTemplate) {
+    public FakeStoreProductService(RestTemplate restTemplate, RedisTemplate redisTemplate) {
         this.restTemplate = restTemplate;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
     public Product getSingleProduct(Long productId) throws ProductNotFoundException {
+        Product productFromRedis = (Product) redisTemplate.opsForHash().get("PRODUCT","PRODUCT_"+productId);
+        if (productFromRedis != null) {
+            return productFromRedis;
+        }
+
         FakeStoreProductDto fakestoreProductDto =  restTemplate.getForObject("https://fakestoreapi.com/products/"
                 + productId,FakeStoreProductDto.class);
 
@@ -28,13 +38,16 @@ public class FakeStoreProductService implements ProductService{
         {
             throw new ProductNotFoundException("Product not found with ID" + productId);
         }
-
+        redisTemplate.opsForHash().put("PRODUCT","PRODUCT_"+productId,fakestoreProductDto.toProduct());
         return fakestoreProductDto.toProduct();
 
     }
 
+
+
     @Override
-    public List<Product> getAllProducts() {
+    public Page<Product> getAllProducts(int pageNumber,int pageSize) {
+
         List<Product> products = new ArrayList<>();
         FakeStoreProductDto[] res = restTemplate.getForObject("https://fakestoreapi.com/products/", FakeStoreProductDto[].class);
 
@@ -42,8 +55,12 @@ public class FakeStoreProductService implements ProductService{
         {
            products.add(fs.toProduct());
         }
-        return products;
+
+        return null;
+
     }
+
+
 
     @Override
     public Product createProduct(Product product) {
@@ -63,48 +80,37 @@ public class FakeStoreProductService implements ProductService{
 
     @Override
     public List<Category> getAllCategory() {
-         /*  List<Category> categories = new ArrayList<>();
-        FakeStoreProductDto[] cares = restTemplate.getForObject("https://fakestoreapi.com/categories", FakeStoreProductDto[].class);
-
-        for(FakeStoreProductDto fs : cares)
+        List<Category> categoryList = new ArrayList<>();
+        FakeStoreCategoryDto[] cres = restTemplate.getForObject("https://fakestoreapi.com/products/categories", FakeStoreCategoryDto[].class);
+        for(FakeStoreCategoryDto fsc : cres)
         {
-            categories.add(fs.toCategory());
+            categoryList.add(fsc.toCategory());
         }
-        return categories;*/
-        return null;
+        return categoryList;
     }
 
     @Override
     public List<Product> getProductsByCategory(Long categoryId) {
-        return List.of();
-    }
-
-    @Override
-    public Product updateProduct(long productId, Product product) throws ProductNotFoundException {
         return null;
     }
 
     @Override
+    public Product updateProduct(Product product) throws ProductNotFoundException {
+        return null;
+    }
+
+
+    @Override
     public Product deleteProduct(Long productId) throws ProductNotFoundException {
+        // need to check
         if (restTemplate.getForObject("https://fakestoreapi.com/products/" + productId, FakeStoreProductDto.class) != null)
         {
-            restTemplate.delete("https://fakestoreapi.com/products/" + productId,FakeStoreProductDto.class);
+            restTemplate.delete("https://fakestoreapi.com/products/" + productId);
+            System.out.println(productId + "Deleted");
             return null;
         }
         else throw new ProductNotFoundException("Product not found with ID" + productId);
     }
-/*
-   @Override
-   public Product updateProduct(Product product) {
-       FakeStoreProductDto upres = restTemplate.put("https://fakestoreapi.com/products/");
-    }
 
-    @Override
-    public Product deleteProduct(Long productId) {
-        FakeStoreProductDto del = restTemplate.delete("https://fakestoreapi.com/products/" + productId,FakeStoreProductDto.class);
-        return del.toProduct();
-    }
-
-*/
 }
 
