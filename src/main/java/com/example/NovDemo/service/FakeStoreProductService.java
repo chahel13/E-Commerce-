@@ -114,7 +114,7 @@ public class FakeStoreProductService implements ProductService{
        fakeStoreProductDto.setCategory(product.getCategory().getTitle());
 
 
-        restTemplate.put("https://fakestoreapi.com/products/" + product.getId(),exProduct, FakeStoreProductDto.class);
+        restTemplate.put("https://fakestoreapi.com/products/" + product.getId(),fakeStoreProductDto, FakeStoreProductDto.class);
         return product;
     }
 
