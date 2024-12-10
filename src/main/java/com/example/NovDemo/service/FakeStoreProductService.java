@@ -96,7 +96,26 @@ public class FakeStoreProductService implements ProductService{
 
     @Override
     public Product updateProduct(Product product) throws ProductNotFoundException {
-        return null;
+        //updating existing product
+        Product exProduct = getSingleProduct(product.getId());
+        exProduct.setTitle(product.getTitle());
+        exProduct.setDescription(product.getDescription());
+        exProduct.setPrice(product.getPrice());
+        exProduct.setImageurl(product.getImageurl());
+        exProduct.setCategory(product.getCategory());
+
+     // to send in request body
+       FakeStoreProductDto fakeStoreProductDto = new FakeStoreProductDto();
+       fakeStoreProductDto.setId(product.getId());
+       fakeStoreProductDto.setTitle(product.getTitle());
+       fakeStoreProductDto.setDescription(product.getDescription());
+       fakeStoreProductDto.setPrice(product.getPrice());
+       fakeStoreProductDto.setImage(product.getImageurl());
+       fakeStoreProductDto.setCategory(product.getCategory().getTitle());
+
+
+        restTemplate.put("https://fakestoreapi.com/products/" + product.getId(),exProduct, FakeStoreProductDto.class);
+        return product;
     }
 
 
