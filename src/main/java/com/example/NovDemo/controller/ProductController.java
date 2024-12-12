@@ -19,15 +19,16 @@ public class ProductController {
 
     private ProductService productService;
 
-    public ProductController(@Qualifier("fakeProductService") ProductService productService) {
+    public ProductController(@Qualifier("selfProductService") ProductService productService) {
         this.productService = productService;
     }
 
     @PostMapping("/products")
-    public Product createProduct(@RequestBody Product product)
+    public ResponseEntity <Product> createProduct(@RequestBody Product product)
     {
         Product postRequestResponse = productService.createProduct(product);
-        return postRequestResponse;
+        ResponseEntity<Product> crproduct = new ResponseEntity<>( postRequestResponse, HttpStatus.CREATED);
+        return crproduct;
     }
 
     @GetMapping("/products/{id}")

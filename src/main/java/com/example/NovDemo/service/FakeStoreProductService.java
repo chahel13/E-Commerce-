@@ -90,7 +90,7 @@ public class FakeStoreProductService implements ProductService{
     }
 
     @Override
-    public List<Product> getProductsByCategory(Long categoryId) {
+    public List<Product> getProductsByCategory(Long  categoryId) {
         return null;
     }
 
@@ -122,7 +122,8 @@ public class FakeStoreProductService implements ProductService{
     @Override
     public Product deleteProduct(Long productId) throws ProductNotFoundException {
         // need to check
-        if (restTemplate.getForObject("https://fakestoreapi.com/products/" + productId, FakeStoreProductDto.class) != null)
+        Product dp = getSingleProduct(productId);
+        if(dp != null)
         {
             restTemplate.delete("https://fakestoreapi.com/products/" + productId);
             System.out.println(productId + "Deleted");
